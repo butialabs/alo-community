@@ -1,0 +1,28 @@
+# Exclude vendor directory - should be installed inside container
+app/vendor/
+app/composer.lock
+
+# IDE and OS files
+.idea/
+.vscode/
+*.code-workspace
+.DS_Store
+Thumbs.db
+
+# Git files
+.git/
+.gitignore
+
+# Logs and cache
+*.log
+*.cache
+
+# Build artifacts
+app/node_modules/
+app/build/
+app/dist/
+
+# Private files
+app/private/
+app/config/.*
+app/config/geoip/*

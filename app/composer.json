@@ -14,7 +14,7 @@
         "minishlink/web-push": "^9.0",
         "nyholm/psr7": "^1.8",
         "nyholm/psr7-server": "^1.1",
-        "php-amqplib/php-amqplib": "^3.6",
+        "php-amqplib/php-amqplib": "^3.7",
         "php-di/php-di": "^7.0",
         "phpmailer/phpmailer": "^6.9",
         "phpoffice/phpspreadsheet": "^3.8",
