@@ -12,8 +12,8 @@ ENV ENABLE_CRONTAB=1
 ENV ENABLE_CRONTAB_DEBUG=0
 ENV ALLOW_RUNTIME_PHP_ENVVARS=1
 ENV DISABLE_AUTORUN_GENERATING_INDEX=1
-ENV DISABLE_AUTORUN_COMPOSER_INSTALL=0
-ENV COMPOSER_OPTIMIZE_AUTOLOADER=1
+ENV DISABLE_AUTORUN_COMPOSER_INSTALL=1
+ENV COMPOSER_OPTIMIZE_AUTOLOADER=0
 ENV DISABLE_GREETING=1
 
 ENV PHP_CURL_CAINFO=/app/cacert.pem
@@ -27,6 +27,9 @@ ENV PHP_MEMORY_LIMIT=512M
 RUN phpaddmod sockets gmp
 
 ADD app/ /app/
+
+RUN composer config platform.php-64bit 8.3
+RUN composer install --no-interaction --optimize-autoloader
 
 ADD docker/supervisor/conf.d/alo.conf /etc/supervisor/conf.d/alo.conf
 ADD docker/nginx/00-alo.conf /etc/nginx/custom.d/00-alo.conf
