@@ -1,37 +1,56 @@
-FROM shinsenter/php:8.3-fpm-nginx
+FROM php:8.3-fpm
 
-ENV TZ=UTC
-ENV WORKERS=1
+RUN apt-get update && apt-get install -y \
+    nginx \
+    nano \
+    procps \
+    psmisc \
+    zip \
+    git \
+    htop \
+    nano \
+    cron \
+    libzip-dev \
+    libonig-dev \
+    libxml2-dev \
+    libssl-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    supervisor \
+    libgmp-dev \
+    libcurl4-openssl-dev \
+    && docker-php-ext-install pdo_mysql sockets gd zip gmp bcmath curl \
+    && pecl install \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-ENV APP_PATH=/app
-ENV DOCUMENT_ROOT=public
+COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
-ENV DEBUG=0
-ENV ENABLE_TUNING_FPM=1
-ENV ENABLE_CRONTAB=1
-ENV ENABLE_CRONTAB_DEBUG=0
-ENV ALLOW_RUNTIME_PHP_ENVVARS=1
-ENV DISABLE_AUTORUN_GENERATING_INDEX=1
-ENV DISABLE_AUTORUN_COMPOSER_INSTALL=1
-ENV COMPOSER_OPTIMIZE_AUTOLOADER=0
-ENV DISABLE_GREETING=1
+WORKDIR /app
 
-ENV PHP_CURL_CAINFO=/app/cacert.pem
-ENV PHP_CURL_CONNECTTIMEOUT=300
-ENV PHP_CURL_TIMEOUT=300
-ENV PHP_REQUEST_TERMINATE_TIMEOUT=300
-ENV PHP_DEFAULT_SOCKET_TIMEOUT=300
-ENV PHP_MAX_EXECUTION_TIME=300
-ENV PHP_MEMORY_LIMIT=512M
+COPY app/ /app/
 
-RUN phpaddmod sockets gmp
+COPY /php.ini ${PHP_INI_DIR}/conf.d/99-php.ini
 
-ADD app/ /app/
+COPY cacert.pem /app/cacert.pem
+
+COPY default.conf /etc/nginx/sites-available/default
+
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+RUN mkdir -p /etc/supervisor/conf.d
+COPY supervisord.conf /etc/supervisor/conf.d
+
+RUN chown -R www-data:www-data /app \
+    && chmod -R 755 /app
 
 RUN composer config platform.php-64bit 8.3
 RUN composer install --no-interaction --optimize-autoloader
 
-ADD docker/supervisor/conf.d/alo.conf /etc/supervisor/conf.d/alo.conf
-ADD docker/nginx/00-alo.conf /etc/nginx/custom.d/00-alo.conf
-ADD docker/crontab.d/alo /etc/crontab.d/alo
-ADD docker/startup/ /startup/
+ENV WORKERS=1
+ENV TZ=UTC
+
+EXPOSE 8088
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
