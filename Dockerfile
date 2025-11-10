@@ -30,17 +30,17 @@ WORKDIR /app
 
 COPY app/ /app/
 
-COPY /php.ini ${PHP_INI_DIR}/conf.d/99-php.ini
+COPY /docker/php.ini ${PHP_INI_DIR}/conf.d/99-php.ini
 
-COPY cacert.pem /app/cacert.pem
+ADD https://curl.se/ca/cacert.pem /app/cacert.pem
 
-COPY default.conf /etc/nginx/sites-available/default
+COPY /docker/default.conf /etc/nginx/sites-available/default
 
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 RUN mkdir -p /etc/supervisor/conf.d
-COPY supervisord.conf /etc/supervisor/conf.d
+COPY /docker/supervisord.conf /etc/supervisor/conf.d
 
 RUN chown -R www-data:www-data /app \
     && chmod -R 755 /app
@@ -51,6 +51,6 @@ RUN composer install --no-interaction --optimize-autoloader
 ENV WORKERS=1
 ENV TZ=UTC
 
-EXPOSE 8088
+EXPOSE 80
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]

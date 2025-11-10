@@ -7,7 +7,7 @@ services:
       TZ: ${TZ:-UTC}
       WORKERS: ${WORKERS:-1}
     ports:
-      - 8088:8088
+      - 8088:80
     volumes:
       - ./alo/config:/app/config
     restart: unless-stopped
