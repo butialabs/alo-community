@@ -135,10 +135,10 @@
 
                         if (isset($segments) && is_array($segments)) {
                             foreach ($segments as $key => $segment) {
-                                $values = null;
+                                $values = [];
                                 foreach ($listSegments as $listSegment) {
                                     if ($segment['type'] == $listSegment['id']) {
-                                        $values = $listSegment['values'];
+                                        $values = $listSegment['values'] ?? [];
                                     }
                                 }
                         ?>
@@ -153,7 +153,8 @@
                                     </div>
                                     <div class="col">
                                         <select class="form-select segment-values" name="segments[<?= $key ?>][values][]" multiple="" size="10">
-                                            <?php foreach ($values as $value) {
+                                            <?php if (is_array($values)) {
+                                                foreach ($values as $value) {
                                                 $selected = '';
 
                                                 foreach ($segment['values'] as $selectedValue) {
@@ -163,7 +164,8 @@
                                                 }
                                             ?>
                                                 <option <?= $selected ?> value="<?= $value; ?>"><?= $value; ?></option>
-                                            <?php } ?>
+                                            <?php }
+                                            } ?>
                                         </select>
                                     </div>
                                     <div class="col-auto">
